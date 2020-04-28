@@ -1,0 +1,1381 @@
+swagger: '2.0'
+info:
+  title: Ivanti Service
+  version: '1.0'
+  description: Proxy that allows users to perform select operations in Ivanti using a REST API.
+host: nthrivetest.azure-api.net
+basePath: /IvantiService
+schemes:
+  - https
+  
+paths:
+  /incident:
+    post:
+      operationId: CreateIncident
+      description: Creates an incident with the provided values.
+      parameters:
+        - x-amf-mediaType: application/json
+          in: body
+          name: generated
+          schema:
+            example:
+              Customer: test@ivantiServiceTest.com
+              Summary: Test summary from the Ivanti Service
+              Description: Test description from the Ivanti Service
+              Service: Software
+              Category: Server
+              Urgency: 3 Has Workaround
+              Impact: 3 Single User
+              Status: Active
+              Team: Service Desk
+              Owner: teamMember@ivantiServiceTest.com
+              Resolution: Test resolution from the Ivanti Service
+              CauseCode: Install Request
+              ActualService: Software
+              ActualCategory: Workstation
+            type: object
+            additionalProperties: true
+            required:
+              - Customer
+              - Summary
+              - Description
+              - Service
+              - Urgency
+              - Impact
+              - Status
+            properties:
+              Customer:
+                description: The email of the person who submitted the incident.
+                type: string
+              Summary:
+                description: A summary of the incident.
+                type: string
+              Description:
+                description: |-
+                  The description of the incident with relevant details.
+
+                   HTML formatting in this field will be visible on the incdient.
+                type: string
+              Service:
+                description: |-
+                  The affected service.
+
+                  Accepted values:
+
+                  * Access
+
+                  * Hardware 
+
+                  * ISSO/Security
+
+                  * Messaging
+
+                  * Network and Connectivity
+
+                  * Software
+
+                  *  Support and Training
+                type: string
+              Category:
+                description: |-
+                  Required when Service is Software. The category. 
+
+                  Accepted values:
+
+                  * Server
+
+                  * Workstation
+                type: string
+              Urgency:
+                description: |-
+                  Specifies the time appropriateness required. Urgency and impact together define the priority value.
+
+                  **Submitting an incident with urgency as "1 Work Stoppage" and impact as "1 Company Wide" is not allowed through the Ivanti Service.**
+
+                  Accepted values:
+
+                  * 1 Work Stoppage
+
+                  * 2 Affects Daily Duties
+
+                  * 3 Has Workaround
+                type: string
+              Impact:
+                description: |-
+                  Specifies the impact to the organization, group, or individual. Impact and urgency together define the priority value.
+
+                  **Submitting an incident with urgency as "1 Work Stoppage" and impact as "1 Company Wide" is not allowed through the Ivanti Service.**
+
+                  Accepted values:
+
+                  * 1 Company Wide
+
+                  * 2 Team
+
+                  * 3 Single User
+                type: string
+              Status:
+                description: |-
+                  The status of the incident.
+
+                  Accepted values:
+
+                  * Logged
+
+                  * Active
+
+                  * Waiting for Customer
+
+                  * Waiting for 3rd Party
+
+                  * Waiting for Resolution
+
+                  * Resolved
+
+                  * Closed
+                type: string
+              Team:
+                description: |-
+                  Optional. The team to work on the incident. The list of valid teams is constantly updated. The team must appear in the Team dropdown in Ivanti.
+
+                  Sample values:
+
+                  * Active Directory
+
+                  * Architecture
+
+                  * Azure
+
+                  * Backup\Restore
+                type: string
+              Owner:
+                description: Required when an incident is set to Resolved or Closed. The email address of owner of the incident. The person must be a member of the selected Team.
+                type: string
+              Resolution:
+                description: Required when an incident is set to Resolved or Closed. The resolution information.
+                type: string
+              CauseCode:
+                description: |-
+                  Required when an incident is set to Resolved or Closed. The cause of the incident.
+
+                  Accepted values:
+
+                  * Configuration
+
+                  * Documentation Request
+
+                  * Hardware
+
+                  * Install Request
+
+                  * Installation
+
+                  * Linked Problem
+
+                  * Other
+
+                  * Reference Request
+
+                  * Session Reset
+
+                  * Software
+
+                  * Training
+                type: string
+              ActualService:
+                description: |-
+                  The actual affected service.
+
+                  Accepted values:
+
+                  * Access
+
+                  * Hardware 
+
+                  * ISSO/Security
+
+                  * Messaging
+
+                  * Network and Connectivity
+
+                  * Software
+
+                  *  Support and Training
+                type: string
+              ActualCategory:
+                description: |-
+                  Required when Service is Software. The actual category. 
+
+                  Accepted values:
+
+                  * Server
+
+                  * Workstation
+                type: string
+      responses:
+        '201':
+          description: ''
+          x-amf-mediaType: application/json
+          schema:
+            example:
+              Result: Success
+              RecId: '123456789101112131415'
+              IncidentNumber: '10000'
+            type: object
+            additionalProperties: true
+            required:
+              - Result
+              - RecId
+              - IncidentNumber
+            properties:
+              Result:
+                description: The result of the API call
+                example: Success
+                type: string
+              RecId:
+                description: The incident's unique identifier
+                example: '123456789101112131415'
+                type: string
+              IncidentNumber:
+                description: The incident number
+                example: '10000'
+                type: string
+        '400':
+          description: ''
+          x-amf-mediaType: application/json
+          schema:
+            example:
+              Result: Error
+              Detail: Failed to create incident - Customer is not an active Ivanti user
+            type: object
+            additionalProperties: true
+            required:
+              - Result
+              - Detail
+            properties:
+              Result:
+                description: The result of the API call
+                example: Error
+                type: string
+              Detail:
+                description: The error message
+                example: Failed to create incident - Customer is not an active Ivanti user
+                type: string
+    get:
+      operationId: GetIncident
+      description: Fetches incidents based on the defined search values.
+      parameters:
+        - name: Customer
+          required: false
+          in: query
+          type: string
+        - name: Service
+          required: false
+          in: query
+          type: string
+        - name: Category
+          required: false
+          in: query
+          type: string
+        - name: Urgency
+          required: false
+          in: query
+          type: string
+        - name: Impact
+          required: false
+          in: query
+          type: string
+        - name: Status
+          required: false
+          in: query
+          type: string
+        - name: Team
+          required: false
+          in: query
+          type: string
+        - name: Owner
+          required: false
+          in: query
+          type: string
+        - name: CauseCode
+          required: false
+          in: query
+          type: string
+        - name: ActualService
+          required: false
+          in: query
+          type: string
+        - name: ActualCategory
+          required: false
+          in: query
+          type: string
+        - name: IncidentNumber
+          required: false
+          in: query
+          type: string
+        - name: FirstCallResolution
+          required: false
+          in: query
+          type: boolean
+      responses:
+        '200':
+          description: ''
+          x-amf-mediaType: application/json
+          schema:
+            example:
+              incidents:
+                - RecId: '123456789101112131415'
+                  Customer: test@ivantiServiceTest.com
+                  Summary: Test summary from the Ivanti Service
+                  Description: Test description from the Ivanti Service
+                  Service: Software
+                  Category: Server
+                  Urgency: 3 Has Workaround
+                  Impact: 3 Single User
+                  Priority: '5'
+                  Status: Active
+                  Team: Service Desk
+                  Owner: testTeamMember@ivantiServiceTest.com
+                  Resolution: Test resolution from the Ivanti Service
+                  CauseCode: Install Request
+                  ActualService: Software
+                  ActualCategory: Workstation
+                  ClosedBy: test@ivantiServiceTest.com
+                  ClosedDateTime: '2020-03-26T20:17:29Z'
+                  CreatedBy: test@ivantiServiceTest.com
+                  CreatedDateTime: '2020-03-26T20:17:29Z'
+                  FirstCallResolution: false
+                  IncidentNumber: '10125'
+            type: object
+            additionalProperties: true
+        '204':
+          description: ''
+          x-amf-mediaType: application/json
+          schema: {}
+        '400':
+          description: ''
+          x-amf-mediaType: application/json
+          schema:
+            example:
+              Result: Error
+              Detail: 'Invalid search term: Customer'
+  '/incident/{recId}':
+    patch:
+      operationId: UpdateIncident
+      description: Updates a specific incident with the provided values.
+      parameters:
+        - name: recId
+          description: The incident's unique identifier
+          required: true
+          in: path
+          type: string
+        - x-amf-mediaType: application/json
+          in: body
+          name: generated
+          schema:
+            example:
+              Customer: test@ivantiServiceTest.com
+              Summary: Test summary from the Ivanti Service
+              Description: Test description from the Ivanti Service
+              Service: Software
+              Category: Server
+              Urgency: 3 Has Workaround
+              Impact: 3 Single User
+              Status: Active
+              Team: Service Desk
+              Owner: testTeamMember@ivantiServiceTest.com
+              Resolution: Test resolution from the Ivanti Service
+              CauseCode: Install Request
+              ActualService: Software
+              ActualCategory: Workstation
+            type: object
+            additionalProperties: true
+            required:
+              - Customer
+              - Summary
+              - Description
+              - Service
+              - Urgency
+              - Impact
+              - Status
+            properties:
+              Customer:
+                description: The email of the person who submitted the incident.
+                type: string
+              Summary:
+                description: A summary of the incident.
+                type: string
+              Description:
+                description: |-
+                  The description of the incident with relevant details.
+
+                   HTML formatting in this field will be visible on the incdient.
+                type: string
+              Service:
+                description: |-
+                  The affected service.
+
+                  Accepted values:
+
+                  * Access
+
+                  * Hardware 
+
+                  * ISSO/Security
+
+                  * Messaging
+
+                  * Network and Connectivity
+
+                  * Software
+
+                  *  Support and Training
+                type: string
+              Category:
+                description: |-
+                  The category. Required when Service = Software.
+
+                  Accepted values:
+
+                  * Server
+
+                  * Workstation
+                type: string
+              Urgency:
+                description: |-
+                  Specifies the time appropriateness required. Urgency and impact together define the priority value.
+
+                  **Submitting an incident with urgency as "1 Work Stoppage" and impact as "1 Company Wide" is not allowed through the Ivanti Service.**
+
+                  Accepted values:
+
+                  * 1 Work Stoppage
+
+                  * 2 Affects Daily Duties
+
+                  * 3 Has Workaround
+                type: string
+              Impact:
+                description: |-
+                  Specifies the impact to the organization, group, or individual. Impact and urgency together define the priority value.
+
+                  **Submitting an incident with urgency as "1 Work Stoppage" and impact as "1 Company Wide" is not allowed through the Ivanti Service.**
+
+                  Accepted values:
+
+                  * 1 Company Wide
+
+                  * 2 Team
+
+                  * 3 Single User
+                type: string
+              Status:
+                description: |-
+                  The status of the incident.
+
+                  Accepted values:
+
+                  * Logged
+
+                  * Active
+
+                  * Waiting for Customer
+
+                  * Waiting for 3rd Party
+
+                  * Waiting for Resolution
+
+                  * Resolved
+
+                  * Closed
+                type: string
+              Team:
+                description: |-
+                  Optional. The team to work on the incident. The list of valid teams is constantly updated. The team must appear in the Team dropdown in Ivanti.
+
+                  Sample values:
+
+                  * Active Directory
+
+                  * Architecture
+
+                  * Azure
+
+                  * Backup\Restore
+                type: string
+              Owner:
+                description: Required when an incident is set to Resolved or Closed. The email address of owner of the incident. The person must be a member of the selected Team.
+                type: string
+              Resolution:
+                description: Required when an incident is set to Resolved or Closed. The resolution information.
+                type: string
+              CauseCode:
+                description: |-
+                  Required when an incident is set to Resolved or Closed. The cause of the incident.
+
+                  Accepted values:
+
+                  * Configuration
+
+                  * Documentation Request
+
+                  * Hardware
+
+                  * Install Request
+
+                  * Installation
+
+                  * Linked Problem
+
+                  * Other
+
+                  * Reference Request
+
+                  * Session Reset
+
+                  * Software
+
+                  * Training
+                type: string
+              ActualService:
+                description: |-
+                  The actual affected service.
+
+                  Accepted values:
+
+                  * Access
+
+                  * Hardware 
+
+                  * ISSO/Security
+
+                  * Messaging
+
+                  * Network and Connectivity
+
+                  * Software
+
+                  *  Support and Training
+                type: string
+              ActualCategory:
+                description: |-
+                  Required when Service is Software. The actual category. 
+
+                  Accepted values:
+
+                  * Server
+
+                  * Workstation
+                type: string
+      responses:
+        '200':
+          description: ''
+          x-amf-mediaType: application/json
+          schema:
+            example:
+              Result: Success
+              RecId: '123456789101112131415'
+              IncidentNumber: '10000'
+            type: object
+            additionalProperties: true
+            required:
+              - Result
+              - RecId
+              - IncidentNumber
+            properties:
+              Result:
+                description: The result of the API call
+                example: Success
+                type: string
+              RecId:
+                description: The incident's unique identifier
+                example: '123456789101112131415'
+                type: string
+              IncidentNumber:
+                description: The incident number
+                example: '10000'
+                type: string
+        '400':
+          description: ''
+          x-amf-mediaType: application/json
+          schema:
+            example:
+              Result: Error
+              Detail: Failed to update incident - Customer is not an active Ivanti user
+            type: object
+            additionalProperties: true
+            required:
+              - Result
+              - Detail
+            properties:
+              Result:
+                description: The result of the API call
+                example: Error
+                type: string
+              Detail:
+                description: The error message
+                example: Failed to update incident - Customer is not an active Ivanti user
+                type: string
+    get:
+      operationId: GetIncidentByRecId
+      description: Returns data about a specific incident.
+      parameters:
+        - name: recId
+          description: The incident's unique identifier
+          required: true
+          in: path
+          type: string
+      responses:
+        '200':
+          description: ''
+          x-amf-mediaType: application/json
+          schema:
+            example:
+              RecId: '123456789101112131415'
+              Customer: test@ivantiServiceTest.com
+              Summary: Test summary from the Ivanti Service
+              Description: Test description from the Ivanti Service
+              Service: Software
+              Category: Server
+              Urgency: 3 Has Workaround
+              Impact: 3 Single User
+              Priority: '5'
+              Status: Active
+              Team: Service Desk
+              Owner: testTeamMember@ivantiServiceTest.com
+              Resolution: Test resolution from the Ivanti Service
+              CauseCode: Install Request
+              ActualService: Software
+              ActualCategory: Workstation
+              ClosedBy: test@ivantiServiceTest.com
+              ClosedDateTime: '2020-03-26T20:17:29Z'
+              CreatedBy: test@ivantiServiceTest.com
+              CreatedDateTime: '2020-03-26T20:17:29Z'
+              FirstCallResolution: false
+              IncidentNumber: '10125'
+            type: object
+            additionalProperties: true
+        '204':
+          description: ''
+          x-amf-mediaType: application/json
+          schema: {}
+  /change:
+    post:
+      operationId: CreateChange
+      description: Creates a change with the provided values.
+      parameters:
+        - x-amf-mediaType: application/json
+          in: body
+          name: generated
+          schema:
+            example:
+              RequestedBy: testRequester@nthrive.com
+              Status: Pending Approval
+              Team: Escalation
+              Assignee: TestAssignee@ivantiServiceTest.com
+              PeerReview: TestPeerReviewer@ivantiServiceTest.com
+              CoordinatorTeam: Change Management
+              Coordinator: TestCoordinator@ivantiServiceTest.com
+              Summary: Test Summary from the Ivanti Service
+              Description: Test Description from the Ivanti Service
+              ChangeType: Minor
+              UrgencyTiming: Standard
+              Category: Software
+              Justification: Enhancement
+              MaintenanceWindow: 'No'
+              Impact: Low
+              Urgency: Low
+              StartDate: '2020-01-01T00:00:00Z'
+              EndDate: '2020-01-01T01:00:00Z'
+              ImplementationPlans: Test Implementation Plans from the Ivanti Service
+              BackoutPlans: Test Backout Plans from the Ivanti Service
+              ImpactStatement: Test Impact Statement from the Ivanti Service
+              URLsAffected: Test URLs Affected from the Ivanti Service
+            type: object
+            additionalProperties: true
+            required:
+              - Status
+              - Team
+              - Assignee
+              - PeerReview
+              - CoordinatorTeam
+              - Coordinator
+              - Summary
+              - Description
+              - ChangeType
+              - UrgencyTiming
+              - Category
+              - StartDate
+              - EndDate
+            properties:
+              RequestedBy:
+                description: 'The requester of the change. If no requester is provided, Requested By will be shown as nThrive Ivanti API.'
+                type: string
+              Status:
+                description: |-
+                  The status of the change.
+
+                  Accepted values:
+
+                  * Draft
+
+                  * Logged
+
+                  * Scheduled
+
+                  * Implemented
+
+                  * Cancelled
+                type: string
+              Team:
+                description: |-
+                  Optional. The team to work on the incident. The list of valid teams is constantly updated. The team must appear in the Team dropdown in Ivanti.
+
+                  Sample values:
+
+                  * Active Directory
+
+                  * Architecture
+
+                  * Azure
+
+                  * Backup\Restore
+                type: string
+              Assignee:
+                description: The email address of the person who will execute the change. The person must be a member of the selected Team.
+                type: string
+              PeerReview:
+                description: The email address of the person who has reviewed the change. The person must be a member of the selected Team.
+                type: string
+              CoordinatorTeam:
+                description: |-
+                  The team associated with the coordinator of the change. The list of valid teams is constantly updated. The team must appear in the Team dropdown in Ivanti.
+
+                  Sample values:
+
+                  * Active Directory
+
+                  * Architecture
+
+                  * Azure
+
+                  * Backup\Restore
+                type: string
+              Coordinator:
+                description: The email address of the coordinator. The person must be a member of the selected CoordinatorTeam.
+                type: string
+              Summary:
+                description: Subject or title of the change.
+                type: string
+              Description:
+                description: Details of the change.
+                type: string
+              ChangeType:
+                description: |-
+                  The type of change.
+
+                  Accepted values:
+
+                  * Emergency
+
+                  * Major
+
+                  * Minor
+
+                  * Significant
+
+                  * Standard
+                type: string
+              UrgencyTiming:
+                description: |-
+                  The time appropriateness required.
+
+                  Accepted values:
+
+                  * Emergency
+
+                  * Normal
+
+                  * Standard
+
+                  * Urgent
+                type: string
+              Category:
+                description: |-
+                  The category of the change.
+
+                  Accepted values:
+
+                  * Computer
+
+                  * Software
+
+                  * Network Device
+
+                  * Storage
+
+                  * Power Device
+
+                  * Document
+
+                  * Telecom
+
+                  * Logical
+
+                  * Administration
+                type: string
+              Justification:
+                description: |-
+                  Optional. The reason for the change.
+
+                  Accepted values:
+
+                  * (None)
+
+                  * Enhancement
+
+                  * Incident / Problem
+
+                  * Release
+
+                  * Scheduled Maintenance
+
+                  * Unscheduled Maintenance
+                type: string
+              MaintenanceWindow:
+                description: |-
+                  Optional. Whether the change requires a maintenance window.
+
+                  Accepted values:
+
+                  * No
+
+                  * Yes
+                type: string
+              Impact:
+                description: |-
+                  Optional. Impact to the organization, group, or individual. Impact and urgency together define the priority value.
+
+                  Accepted values:
+
+                  * High
+
+                  * Medium
+
+                  * Low
+                type: string
+              Urgency:
+                description: |-
+                  Optional. The time appropriateness required. Urgency and impact together define the priority value.
+
+                  Accepted values:
+
+                  * High
+
+                  * Medium
+
+                  * Low
+                type: string
+              StartDate:
+                description: 'The date and time when the event starts (in UTC); should be in the following format: "yyyy-mm-ddThh:mm:ssZ".'
+                type: string
+                format: date-time
+              EndDate:
+                description: 'The date and time when the event ends (in UTC); should be in the following format: "yyyy-mm-ddThh:mm:ssZ".'
+                type: string
+                format: date-time
+              ImplementationPlans:
+                description: Optional. The plans for implementing the change.
+                type: string
+              BackoutPlans:
+                description: Optional. The plans for backing out the change.
+                type: string
+              ImpactStatement:
+                description: Optional. The impact of making the change.
+                type: string
+              URLsAffected:
+                description: Optional. A list of the URLs affected by the change.
+                type: string
+      responses:
+        '201':
+          description: ''
+          x-amf-mediaType: application/json
+          schema:
+            example:
+              Result: Success
+              RecId: '123456789101112131415'
+              ChangeNumber: '10000'
+            type: object
+            additionalProperties: true
+            required:
+              - Result
+              - RecId
+              - ChangeNumber
+            properties:
+              Result:
+                description: The result of the API call
+                example: Success
+                type: string
+              RecId:
+                description: The change's unique identifier
+                example: '123456789101112131415'
+                type: string
+              ChangeNumber:
+                description: The change number
+                example: '10000'
+                type: string
+        '400':
+          description: ''
+          x-amf-mediaType: application/json
+          schema:
+            example:
+              Result: Error
+              Detail: Failed to create change - Requested By is not an active Ivanti user
+            type: object
+            additionalProperties: true
+            required:
+              - Result
+              - Detail
+            properties:
+              Result:
+                description: The result of the API call
+                example: Error
+                type: string
+              Detail:
+                description: The error message
+                example: Failed to create change - Requested By is not an active Ivanti user
+                type: string
+    get:
+      operationId: GetChange
+      description: Fetches changes based on the defined search values.
+      parameters:
+        - name: RequestedBy
+          required: false
+          in: query
+          type: string
+        - name: Status
+          required: false
+          in: query
+          type: string
+        - name: Team
+          required: false
+          in: query
+          type: string
+        - name: Assignee
+          required: false
+          in: query
+          type: string
+        - name: PeerReview
+          required: false
+          in: query
+          type: string
+        - name: CoordinatorTeam
+          required: false
+          in: query
+          type: string
+        - name: Coordinator
+          required: false
+          in: query
+          type: string
+        - name: ChangeType
+          required: false
+          in: query
+          type: string
+        - name: UrgencyTiming
+          required: false
+          in: query
+          type: string
+        - name: Category
+          required: false
+          in: query
+          type: string
+        - name: Justification
+          required: false
+          in: query
+          type: string
+        - name: MaintenanceWindow
+          required: false
+          in: query
+          type: string
+        - name: Impact
+          required: false
+          in: query
+          type: string
+        - name: Urgency
+          required: false
+          in: query
+          type: string
+      responses:
+        '200':
+          description: ''
+          x-amf-mediaType: application/json
+          schema:
+            example:
+              changes:
+                - RecId: '123456789101112131415'
+                  RequestedBy: test@ivantiServiceTest.com
+                  Status: Pending Approval
+                  Team: Escalation
+                  Assignee: TestAssignee@ivanteServiceTest.com
+                  PeerReview: TestPeerReviewer@ivanteServiceTest.com
+                  CoordinatorTeam: Change Management
+                  Coordinator: TestCoordinator@ivanteServiceTest.com
+                  Summary: Test Summary from the Ivanti Service
+                  Description: Test Description from the Ivanti Service
+                  ChangeType: Minor
+                  UrgencyTiming: Standard
+                  Category: Software
+                  Justification: Enhancement
+                  MaintenanceWindow: 'No'
+                  Impact: Low
+                  Urgency: Low
+                  StartDate: '2020-01-01T00:00:00Z'
+                  EndDate: '2020-01-01T01:00:00Z'
+                  ImplementationPlans: Test Implementation Plans from the Ivanti Service
+                  BackoutPlans: Test Backout Plans from the Ivanti Service
+                  ImpactStatement: Test Impact Statement from the Ivanti Service
+                  URLsAffected: Test URLs Affected from the Ivanti Service
+            type: object
+            additionalProperties: true
+        '204':
+          description: ''
+          x-amf-mediaType: application/json
+          schema: {}
+        '400':
+          description: ''
+          x-amf-mediaType: application/json
+          schema:
+            example:
+              Result: Error
+              Detail: 'Invalid search term: RequestedBy'
+  '/change/{recId}':
+    patch:
+      operationId: UpdateChange
+      description: Updates a specific change with the provided values.
+      parameters:
+        - name: recId
+          required: true
+          in: path
+          type: string
+        - x-amf-mediaType: application/json
+          in: body
+          name: generated
+          schema:
+            example:
+              RequestedBy: testRequrester@nthrive.com
+              Status: Pending Approval
+              Team: Escalation
+              Assignee: TestAssignee@ivantiServiceTest.com
+              PeerReview: TestPeerReviewer@ivantiServiceTest.com
+              CoordinatorTeam: Change Management
+              Coordinator: TestCoordinator@ivantiServiceTest.com
+              Summary: Test Summary from the Ivanti Service
+              Description: Test Description from the Ivanti Service
+              ChangeType: Minor
+              UrgencyTiming: Standard
+              Category: Software
+              Justification: Enhancement
+              MaintenanceWindow: 'No'
+              Impact: Low
+              Urgency: Low
+              StartDate: '2020-01-01T00:00:00Z'
+              EndDate: '2020-01-01T01:00:00Z'
+              ImplementationPlans: Test Implementation Plans from the Ivanti Service
+              BackoutPlans: Test Backout Plans from the Ivanti Service
+              ImpactStatement: Test Impact Statement from the Ivanti Service
+              URLsAffected: Test URLs Affected from the Ivanti Service
+            type: object
+            additionalProperties: true
+            required:
+              - Status
+              - Team
+              - Assignee
+              - PeerReview
+              - CoordinatorTeam
+              - Coordinator
+              - Summary
+              - Description
+              - ChangeType
+              - UrgencyTiming
+              - Category
+              - StartDate
+              - EndDate
+            properties:
+              RequestedBy:
+                description: 'The requester of the change. If no requester is provided, Requested By will be shown as nThrive Ivanti API.'
+                type: string
+              Status:
+                description: |-
+                  The status of the change.
+
+                  Accepted values:
+
+                  * Draft
+
+                  * Logged
+
+                  * Scheduled
+
+                  * Implemented
+
+                  * Cancelled
+                type: string
+              Team:
+                description: |-
+                  The team associated with the person requesting the change. The list of valid teams is constantly updated. The team must appear in the Team dropdown in Ivanti.
+
+                  Sample values:
+
+                  * Active Directory
+
+                  * Architecture
+
+                  * Azure
+
+                  * Backup\Restore
+                type: string
+              Assignee:
+                description: The email address of the person who will execute the change. The person must be a member of the selected Team.
+                type: string
+              PeerReview:
+                description: The email address of the person who has reviewed the change. The person must be a member of the selected Team.
+                type: string
+              CoordinatorTeam:
+                description: |-
+                  The team associated with the coordinator of the change. The list of valid teams is constantly updated. The team must appear in the Team dropdown in Ivanti.
+
+                  Sample values:
+
+                  * Active Directory
+
+                  * Architecture
+
+                  * Azure
+
+                  * Backup\Restore
+                type: string
+              Coordinator:
+                description: The email address of the coordinator. The person must be a member of the selected CoordinatorTeam.
+                type: string
+              Summary:
+                description: Subject or title of the change.
+                type: string
+              Description:
+                description: Details of the change.
+                type: string
+              ChangeType:
+                description: |-
+                  The type of change.
+
+                  Accepted values:
+
+                  * Emergency
+
+                  * Major
+
+                  * Minor
+
+                  * Significant
+
+                  * Standard
+                type: string
+              UrgencyTiming:
+                description: |-
+                  The time appropriateness required.
+
+                  Accepted values:
+
+                  * Emergency
+
+                  * Normal
+
+                  * Standard
+
+                  * Urgent
+                type: string
+              Category:
+                description: |-
+                  The category of the change.
+
+                  Accepted values:
+
+                  * Computer
+
+                  * Software
+
+                  * Network Device
+
+                  * Storage
+
+                  * Power Device
+
+                  * Document
+
+                  * Telecom
+
+                  * Logical
+
+                  * Administration
+                type: string
+              Justification:
+                description: |-
+                  Optional. The reason for the change.
+
+                  Accepted values:
+
+                  * (None)
+
+                  * Enhancement
+
+                  * Incident / Problem
+
+                  * Release
+
+                  * Scheduled Maintenance
+
+                  * Unscheduled Maintenance
+                type: string
+              MaintenanceWindow:
+                description: |-
+                  Optional. Whether the change requires a maintenance window.
+
+                  Accepted values:
+
+                  * No
+
+                  * Yes
+                type: string
+              Impact:
+                description: |-
+                  Optional. Impact to the organization, group, or individual. Impact and urgency together define the priority value.
+
+                  Accepted values:
+
+                  * High
+
+                  * Medium
+
+                  * Low
+                type: string
+              Urgency:
+                description: |-
+                  Optional. The time appropriateness required. Urgency and impact together define the priority value.
+
+                  Accepted values:
+
+                  * High
+
+                  * Medium
+
+                  * Low
+                type: string
+              StartDate:
+                description: 'The date and time when the event starts (in UTC); must be in the following format: "yyyy-mm-ddThh:mm:ssZ".'
+                type: string
+                format: date-time
+              EndDate:
+                description: 'The date and time when the event ends (in UTC); must be in the following format: "yyyy-mm-ddThh:mm:ssZ".'
+                type: string
+                format: date-time
+              ImplementationPlans:
+                description: Optional. The plans for implementing the change.
+                type: string
+              BackoutPlans:
+                description: Optional. The plans for backing out the change.
+                type: string
+              ImpactStatement:
+                description: Optional. The impact of making the change.
+                type: string
+              URLsAffected:
+                description: Optional. A list of the URLs affected by the change.
+                type: string
+      responses:
+        '200':
+          description: ''
+          x-amf-mediaType: application/json
+          schema:
+            example:
+              Result: Success
+              RecId: '123456789101112131415'
+              ChangeNumber: '10000'
+            type: object
+            additionalProperties: true
+            required:
+              - Result
+              - RecId
+              - ChangeNumber
+            properties:
+              Result:
+                description: The result of the API call
+                example: Success
+                type: string
+              RecId:
+                description: The change's unique identifier
+                example: '123456789101112131415'
+                type: string
+              ChangeNumber:
+                description: The change number
+                example: '10000'
+                type: string
+        '400':
+          description: ''
+          x-amf-mediaType: application/json
+          schema:
+            example:
+              Result: Error
+              Detail: Failed to update change - Requested By is not an active Ivanti user
+            type: object
+            additionalProperties: true
+            required:
+              - Result
+              - Detail
+            properties:
+              Result:
+                description: The result of the API call
+                example: Error
+                type: string
+              Detail:
+                description: The error message
+                example: Failed to update change - Requested By is not an active Ivanti user
+                type: string
+    get:
+      operationId: GetChangeByRecId
+      description: Returns data about a specific change.
+      parameters:
+        - name: recId
+          required: true
+          in: path
+          type: string
+      responses:
+        '200':
+          description: ''
+          x-amf-mediaType: application/json
+          schema:
+            example:
+              RecId: '123456789101112131415'
+              RequestedBy: test@ivantiServiceTest.com
+              Status: Pending Approval
+              Team: Escalation
+              Assignee: TestAssignee@ivantiServiceTest.com
+              PeerReview: TestPeerReviewer@ivantiServiceTest.com
+              CoordinatorTeam: Change Management
+              Coordinator: TestCoordinator@ivantiServiceTest.com
+              Summary: Test Summary from the Ivanti Service
+              Description: Test Description from the Ivanti Service
+              ChangeType: Minor
+              UrgencyTiming: Standard
+              Category: Software
+              Justification: Enhancement
+              MaintenanceWindow: 'No'
+              Impact: Low
+              Urgency: Low
+              StartDate: '2020-01-01T00:00:00Z'
+              EndDate: '2020-01-01T01:00:00Z'
+              ImplementationPlans: Test Implementation Plans from the Ivanti Service
+              BackoutPlans: Test Backout Plans from the Ivanti Service
+              ImpactStatement: Test Impact Statement from the Ivanti Service
+              URLsAffected: Test URLs Affected from the Ivanti Service
+        '204':
+          description: ''
+          x-amf-mediaType: application/json
+          schema: {}
